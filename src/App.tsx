@@ -3,6 +3,7 @@ import TodoCard from "./Components/TodoCard";
 
 function App() {
   const [todo, setTodo] = useState<string[]>([]);
+  const [todoToDelete, setTodoToDelete] = useState<string>("");
   let value = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -11,6 +12,12 @@ function App() {
       setTodo(JSON.parse(todoFromLocalStorage));
     }
   }, []);
+
+  useEffect(() => {
+    if (localStorage.getItem("todo") !== "null") {
+      deleteTodo();
+    }
+  }, [todoToDelete]);
 
   const addTodo = () => {
     if (value.current !== null && value.current.value !== "") {
@@ -24,6 +31,15 @@ function App() {
       value.current.value = "";
     }
   };
+
+  const deleteTodo = () => {
+    let newLocalStrorage = todo.filter((todo) => {
+      return todo !== todoToDelete;
+    });
+    localStorage.setItem("todo", JSON.stringify(newLocalStrorage));
+    setTodo(newLocalStrorage);
+  };
+
   return (
     <>
       <div className="container">
@@ -34,7 +50,14 @@ function App() {
         </button>
       </div>
       <div className="todolist-container">
-        <TodoCard todo={todo} />
+        {todo &&
+          todo.map((todo, i) => (
+            <TodoCard
+              key={i}
+              todo={todo}
+              setTodoToDelete={setTodoToDelete}
+            />
+          ))}
       </div>
     </>
   );
